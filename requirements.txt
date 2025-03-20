@@ -5,6 +5,7 @@ cachetools==5.5.2
 certifi==2025.1.31
 charset-normalizer==3.4.1
 click==8.1.8
+dotenv==0.9.9
 gitdb==4.0.12
 GitPython==3.1.44
 idna==3.10
@@ -21,6 +22,7 @@ protobuf==5.29.3
 pyarrow==19.0.1
 pydeck==0.9.1
 python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
 pytz==2025.1
 referencing==0.36.2
 requests==2.32.3
