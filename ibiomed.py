@@ -213,13 +213,18 @@ if st.session_state.autheticated:
 
         st.subheader("Facturas por cobrar")
         highest_due = (
-            filtered_sales_data
+            sales_data[sales_data['item_sales']>0]
             .sort_values(['due', 'issued_at'], ascending=[False, True])
             .query('due > 0')
             .loc[:, ['issued_at', 'invoice_number', 'seller_name', 'payee_name', 'due']]
         )
         highest_due['days_since_issue'] = (pd.Timestamp.today() - highest_due['issued_at']).dt.days
         highest_due['issued_at'] = highest_due['issued_at'].dt.strftime('%Y-%m-%d')
+
+        # Add alert emoji for days since issue greater than 90
+        highest_due['days_since_issue'] = highest_due['days_since_issue'].apply(
+            lambda x: f"{x} 🚨" if x > 90 else str(x)
+        )
 
         highest_due = highest_due.groupby(['issued_at', 'days_since_issue', 'invoice_number', 'seller_name', 'payee_name'])['due'].mean().reset_index()
         highest_due['due'] = highest_due['due'].apply(lambda x: f"Q{x:,.2f}")
