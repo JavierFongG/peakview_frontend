@@ -13,8 +13,8 @@ load_dotenv(override=True)
 
 st.set_page_config(layout="wide")
 
-if not 'autheticated' in st.session_state: 
-    st.session_state.autheticated = False 
+if not 'authenticated' in st.session_state: 
+    st.session_state.authenticated = False 
 
 with open('config.json', 'r') as file: 
     config = json.load(file) 
@@ -23,13 +23,13 @@ with open('config.json', 'r') as file:
 def fetch_data(url): 
     return requests.get(url = url).json() 
 
-if not st.session_state.autheticated: 
+if not st.session_state.authenticated: 
     
     with st.sidebar:         
         pwd = st.sidebar.text_input('password', type = 'password') 
-        st.session_state.autheticated = hashlib.sha256(pwd.encode()).hexdigest() in config['keys']
+        st.session_state.authenticated = hashlib.sha256(pwd.encode()).hexdigest() in config['keys']
 
-if st.session_state.autheticated:
+if st.session_state.authenticated:
 
     sales_data = pd.DataFrame(fetch_data(os.getenv("BASE_URL") + "/sales/details"))
 
