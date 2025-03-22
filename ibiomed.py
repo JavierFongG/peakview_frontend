@@ -14,7 +14,7 @@ load_dotenv(override=True)
 st.set_page_config(layout="wide")
 
 if not 'authenticated' in st.session_state: 
-    st.session_state.authenticated = False 
+    st.session_state.authenticated = False
 
 with open('config.json', 'r') as file: 
     config = json.load(file) 
@@ -60,7 +60,7 @@ if st.session_state.authenticated:
     # Combine both datasets
     sales_data = pd.concat([summarized_data, creditnote_data], ignore_index=True)
 
-    st.title('Vista General')
+    
 
     ### SIDEBAR 
     with st.sidebar:
@@ -73,13 +73,17 @@ if st.session_state.authenticated:
             max_value=max_date
         )
 
-        
+
+
     ### MAIN PANEL 
+
+    st.title('Vista General')
 
     ### HEADER 
     if len(date_range) < 2: 
         st.subheader('Seleccione un período valido')
     else:
+        st.text(f'Periodo: {date_range[0]} a {date_range[1]}')
         # Filter sales_data by the selected date range
         filtered_sales_data = sales_data[
             (sales_data['issued_at'] >= pd.Timestamp(date_range[0])) & 
