@@ -204,7 +204,6 @@ if st.session_state.authenticated:
                 .groupby('item_name', as_index=False)
                 .agg({'item_sales': 'sum'})
                 .sort_values('item_sales', ascending=False)
-                .head(10)
             )
             top_items['percentage'] = ((top_items['item_sales'] / top_items['item_sales'].sum()) * 100).round(1).astype(str) + '%'
             top_items['item_sales'] = top_items['item_sales'].apply(lambda x: f"Q{x:,.2f}")
@@ -213,7 +212,7 @@ if st.session_state.authenticated:
                     'item_name' : 'Producto'
                     , 'item_sales': 'Monto vendido'
                     , 'percentage': 'Porcentaje de la venta (%)'
-                }),
+                }).head(10),
                 use_container_width=True,
                 hide_index=True
             )
