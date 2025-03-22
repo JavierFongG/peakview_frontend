@@ -53,29 +53,24 @@ if st.session_state.authenticated:
     sales_data_grouped = sales_data_grouped.reindex(all_combinations, fill_value=0)
 
     # Sort values by month
-    sales_data_grouped = sales_data_grouped.reset_index().sort_values(by=['item_category', 'month']).set_index(['item_category', 'month'])
+    sales_data_grouped = sales_data_grouped.reset_index().sort_values(by=['item_category', 'month'])
     
-    # Calculate cumulative item_sales
-    sales_data_grouped = sales_data_grouped.groupby(level=0).cumsum().reset_index()
-    
-    # Add month-specific sales to the DataFrame for tooltips
-    sales_data_grouped['month_sales'] = sales_data.groupby(['item_category', 'month'])['item_sales'].sum().reindex(all_combinations, fill_value=0).values
-
+    sales_data_grouped['cumulative_sales'] = sales_data_grouped.groupby('item_category')['item_sales'].cumsum()
 
     # Create the line plot with dots on observations
     fig = px.line(
         sales_data_grouped,
         x='month',
-        y='item_sales',
+        y='cumulative_sales',
         color='item_category',
         title='Ventas acumuladas por categoría de producto por mes',
         labels={
-            'item_sales': 'Ventas acumuladas',
+            'cumulative_sales': 'Ventas acumuladas',
             'month': 'Mes',
             'item_category': 'Categoría de producto',
-            'month_sales': 'Ventas mensuales'
+            'item_sales': 'Ventas mensuales'
         },
-        hover_data={'month_sales': True}  # Add month-specific sales to the tooltip
+        hover_data={'item_sales': True}  # Add month-specific sales to the tooltip
     )
     fig.update_traces(mode='lines+markers')  # Add dots on observations
 
