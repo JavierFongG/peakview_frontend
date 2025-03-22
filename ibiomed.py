@@ -23,6 +23,11 @@ with open('config.json', 'r') as file:
 def fetch_data(url): 
     return requests.get(url = url).json() 
 
+
+def highlight_cell(val): 
+    color = "#ffcccc" if val > 100 else "white"
+    return f"background-color: {color}"
+
 if not st.session_state.authenticated: 
     
     with st.sidebar:         
@@ -225,13 +230,8 @@ if st.session_state.authenticated:
         highest_due['days_since_issue'] = (pd.Timestamp.today() - highest_due['issued_at']).dt.days
         highest_due['issued_at'] = highest_due['issued_at'].dt.strftime('%Y-%m-%d')
 
-        # Add alert emoji for days since issue greater than 90
-        highest_due['days_since_issue'] = highest_due['days_since_issue'].apply(
-            lambda x: f"{x} 🚨" if x > 90 else str(x)
-        )
-
         highest_due = highest_due.groupby(['issued_at', 'days_since_issue', 'invoice_number', 'seller_name', 'payee_name'])['due'].mean().reset_index()
-        highest_due['due'] = highest_due['due'].apply(lambda x: f"Q{x:,.2f}")
+
         st.dataframe(highest_due.rename(columns={
             'issued_at': 'Fecha emisión',
             'invoice_number': 'No. Factura',
@@ -239,7 +239,7 @@ if st.session_state.authenticated:
             'payee_name': 'Cliente',
             'due': 'Monto por Cobrar',
             'days_since_issue': 'Días desde emisión'
-        })
+        }).style.format({"Monto por Cobrar": "Q{:,.2f}"}).applymap(highlight_cell, subset = ['Días desde emisión'])
             , use_container_width=True
             , hide_index=True
         )

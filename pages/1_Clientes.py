@@ -160,4 +160,4 @@ if st.session_state.authenticated:
     # Format 'Ventas Totales' column as Q{,.2f}
     detailed_table['Ventas Totales'] = detailed_table['Ventas Totales'].round(2)
 
-    st.dataframe(detailed_table, use_container_width=True, hide_index=True)
+    st.dataframe(detailed_table.style.format({"Ventas Totales": "Q{:,.2f}"}), use_container_width=True, hide_index=True)

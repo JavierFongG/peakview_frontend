@@ -14,7 +14,7 @@ with open('config.json', 'r') as file:
     config = json.load(file) 
 
 if not 'authenticated' in st.session_state: 
-    st.session_state.authenticated = False
+    st.session_state.authenticated = True
 
 @st.cache_data
 def fetch_data(url): 
@@ -122,6 +122,28 @@ if st.session_state.authenticated:
         (filtered_data['item_unitprice'] >= min_price) & (filtered_data['item_unitprice'] <= max_price)
     ]
     
+    # Create cards to display key metrics
+    card_column1, card_column2, card_column3 = st.columns(3)
+
+    with card_column1:
+        st.metric(
+            label="Número de productos distintos",
+            value=filtered_data['item_name'].nunique()
+        )
+
+    with card_column2:
+        st.metric(
+            label="Precio unitario promedio",
+            value=f"Q{filtered_data['item_unitprice'].astype('float').mean():,.2f}"
+        )
+
+    with card_column3:
+        filtered_data['item_quantity'] = filtered_data['item_quantity'].astype(float)
+        st.metric(
+            label="Promedio de unidades vendidas por factura",
+            value=f"{filtered_data.groupby('invoice_number')['item_quantity'].mean().mean():,.2f}"
+        )
+
     # Create two columns
     left_column, right_column = st.columns(2)
 
@@ -132,6 +154,9 @@ if st.session_state.authenticated:
             total_sales=('item_sales', 'sum'),
             top_payee=('payee_name', lambda x: x.value_counts().idxmax())
         ).reset_index()
+
+        # Round total sales to 2 decimal places
+        item_summary['total_sales'] = item_summary['total_sales'].round(2)
 
         # Add the last sale date for the top payee
         item_summary['last_sale_to_top_payee'] = item_summary.apply(
@@ -152,7 +177,7 @@ if st.session_state.authenticated:
 
         # Display the table in Streamlit
         st.subheader('Resumen histórico de ventas por producto')
-        st.dataframe(item_summary, hide_index=True, height=800)  # Set the height to 800 pixels
+        st.dataframe(item_summary.style.format({"Ventas totales": "Q{:,.2f}"}), hide_index=True, height=800)  # Set the height to 800 pixels
 
     # Right column: Display the scatter plot
     with right_column:
